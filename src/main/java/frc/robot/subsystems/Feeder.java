@@ -12,14 +12,14 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.CanIdConstants;
 
-public class IntakeRoller extends SubsystemBase {
+public class Feeder extends SubsystemBase {
   
-  private final TalonFX intakeRoller;
+  private final TalonFX feeder;
   private final DutyCycleOut talonOut = new DutyCycleOut(0);
 
 
-  public IntakeRoller() {
-    intakeRoller = new TalonFX(CanIdConstants.intakeRollerCanId);
+  public Feeder() {
+    feeder = new TalonFX(CanIdConstants.hopperCanId);
 
 
     TalonFXConfiguration cfg = new TalonFXConfiguration();
@@ -51,7 +51,7 @@ public class IntakeRoller extends SubsystemBase {
   public void manualDrive(double value){
     talonOut.Output = value;
     talonOut.EnableFOC = true;
-    intakeRoller.setControl(talonOut);
+    feeder.setControl(talonOut);
 
   }
 }
