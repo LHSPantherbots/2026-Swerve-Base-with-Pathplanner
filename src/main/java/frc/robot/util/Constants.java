@@ -15,16 +15,16 @@ public final class Constants {
   }
 
   public static final class CanIdConstants{
-    public static final int centerDriveCanId = 70;
-    public static final int intakePivotCanId = 71;
-    public static final int intakeRollerCanId = 72;
-    public static final int hopperCanId = 73;
-    public static final int feederCanId = 74;
-    public static final int launcherLeftCanId = 75;
-    public static final int launcherRightCanId = 76;
-    public static final int hoodLeftCanId = 77;
-    public static final int hoodRightCanId = 78;
-    public static final int climberCanId = 79;
+    public static final int centerDriveCanId = 14;
+    public static final int intakePivotCanId = 4;
+    public static final int intakeRollerCanId = 5;
+    public static final int hopperCanId = 8;
+    public static final int feederCanId = 9;
+    public static final int launcherLeftCanId = 7;
+    public static final int launcherRightCanId = 6;
+    public static final int hoodLeftCanId = 12;
+    public static final int hoodRightCanId = 11;
+    public static final int climberCanId = 13;
   }
 
   public static final class LEDs{
