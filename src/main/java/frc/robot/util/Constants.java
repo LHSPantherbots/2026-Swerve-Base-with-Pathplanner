@@ -18,6 +18,7 @@ public final class Constants {
     public static final int centerDriveCanId = 14;
     public static final int intakePivotCanId = 4;
     public static final int intakeRollerCanId = 5;
+    public static final int intakePivotEncoderCanId = 55;
     public static final int hopperCanId = 8;
     public static final int feederCanId = 9;
     public static final int launcherLeftCanId = 7;
