@@ -54,4 +54,13 @@ public class IntakeRoller extends SubsystemBase {
     intakeRoller.setControl(talonOut);
 
   }
+
+
+  public void intake(){
+    manualDrive(.4);
+  }
+
+  public void eject(){
+    manualDrive(-.4);
+  }
 }
