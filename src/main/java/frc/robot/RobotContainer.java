@@ -12,6 +12,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,7 +25,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CenterDrive;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Hood;
+import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.IntakeRoller;
 
@@ -50,6 +53,9 @@ public class RobotContainer {
     
     private final CenterDrive centerDrive = new CenterDrive();
     private final IntakeRoller intakeRoller = new IntakeRoller();
+
+    private final Hopper hopper = new Hopper();
+    private final Feeder feeder = new Feeder();
     private final Hood hood = new Hood();
 
 
@@ -90,7 +96,7 @@ public class RobotContainer {
 
         hood.setDefaultCommand(
             new RunCommand(
-                ()->hood.manualMove(m_operatorController.getRightY()), hood )
+                ()->hood.stop(), hood )
         );
 
         // Idle while the robot is disabled. This ensures the configured
@@ -99,6 +105,8 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
+
+        /*DEFAULT CTRE CONTROLS
 
         m_driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
         m_driverController.b().whileTrue(drivetrain.applyRequest(() ->
@@ -119,16 +127,27 @@ public class RobotContainer {
         m_driverController.start().and(m_driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         m_driverController.start().and(m_driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        // Reset the field-centric heading on left bumper press.
-        m_driverController.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        */
+
+        // Reset the field-centric heading on start press.
+
+
+        //==================  DRIVER CONTROLLER ===============================
+
+        m_driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
 
 
 
 
-        ////////    OPERATOR CONTROLLER  ////////////////
+        //=================   OPERATOR CONTROLLER ===============================
         m_operatorController.x().whileTrue(new RunCommand(()->intakeRoller.intake(), intakeRoller));
 
+        m_operatorController.rightTrigger().whileTrue(new RunCommand(()->hopper.forward(), hopper));
+        m_operatorController.rightTrigger().whileTrue(new RunCommand(()->feeder.forward(), feeder));
+
+        //operator must hold the left bumper and move the right joystick up or down to manually move the hood.  has a deadband to keep it from moving with stick drift
+        m_operatorController.leftBumper().whileTrue(new RunCommand(()->hood.manualMove(MathUtil.applyDeadband(m_operatorController.getRightY(),.1)), hood));
 
 
 

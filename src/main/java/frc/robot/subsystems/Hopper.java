@@ -54,4 +54,13 @@ public class Hopper extends SubsystemBase {
     hopper.setControl(talonOut);
 
   }
+
+
+  public void forward(){
+    manualDrive(.4);
+  }
+
+  public void reverse(){
+    manualDrive(-.4);
+  }
 }

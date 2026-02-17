@@ -54,4 +54,12 @@ public class Feeder extends SubsystemBase {
     feeder.setControl(talonOut);
 
   }
+
+  public void forward(){
+    manualDrive(.4);
+  }
+
+  public void reverse(){
+    manualDrive(-.4);
+  }
 }
