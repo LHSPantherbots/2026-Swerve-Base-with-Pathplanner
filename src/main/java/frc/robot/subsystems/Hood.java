@@ -43,9 +43,16 @@ public class Hood extends SubsystemBase {
                                             //moved past the initial zero by this amount then rezeroed.
   
   private double allowableError = 0.1;
-  private double hoodMin = .79;
-  private double hoodMax = .86;
-  private double hoodSetpoint = .82; //-pivot_zero_offset
+  //hood encoder is zeored when unhooked from the actuators and hood is lifted 
+  //vertically until it hits hard stop of the encoder mount
+  private double hoodMin = .79; // value read all the way down
+  private double hoodMax = .86; // value read all the ay at actuator limits
+  private double hoodSetpoint = hoodMin; //-pivot_zero_offset
+  
+  //Hood Position Setpoints
+  private final double shortSetpoint = .80 ; //need to test emperically
+  private final double midSetpoint = .82;
+  private final double longSetpoint = .84;
 
   private ShuffleboardTab tab = Shuffleboard.getTab("Tuning");  //angles used for shuffleboard; taken from 2024 fulcrum code
   private GenericEntry sbAngle = tab.add("Hood Angle", 1)
@@ -156,6 +163,17 @@ public class Hood extends SubsystemBase {
         return (Math.abs(error) < allowableError);
       }
 
+  public void setHoodShort(){
+    setHoodSetpoint(shortSetpoint);
+  }
+
+    public void setHoodMid(){
+    setHoodSetpoint(midSetpoint);
+  }
+
+    public void setHoodLong(){
+    setHoodSetpoint(longSetpoint);
+  }
 
 
 

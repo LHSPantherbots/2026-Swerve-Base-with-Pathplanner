@@ -152,10 +152,15 @@ public class RobotContainer {
         m_operatorController.leftBumper().whileTrue(new RunCommand(()->hood.manualMove(MathUtil.applyDeadband(m_operatorController.getRightY(),.1)), hood));
         m_operatorController.leftBumper().onFalse(new InstantCommand(()->hood.setHoodSetpointToCurrentPosition(),hood));
         
-        //Only used to test hood posion will change in the fugure
-        m_operatorController.a().onTrue(new InstantCommand(()->hood.setHoodSetpoint(.86), hood));
-        m_operatorController.b().onTrue(new InstantCommand(()->hood.setHoodSetpoint(.80), hood));
 
+        //Launcher Setpoints (D-Pad)
+        m_operatorController.povDown().onTrue(new InstantCommand(()->hood.setHoodShort(), hood));
+
+        m_operatorController.povLeft().onTrue(new InstantCommand(()->hood.setHoodMid(), hood));
+
+        m_operatorController.povUp().onTrue(new InstantCommand(()->hood.setHoodLong(), hood));
+
+        
 
 
         drivetrain.registerTelemetry(logger::telemeterize);
