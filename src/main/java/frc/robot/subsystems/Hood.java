@@ -38,10 +38,7 @@ public class Hood extends SubsystemBase {
   private AbsoluteEncoderConfig c_EncoderConfig = new AbsoluteEncoderConfig();
   private final SparkClosedLoopController hoodController;
 
-  private double pivot_zero_offset = .1078;  //wrist was zeroed vertically up 
-                                            //agains the elevator for initial setpoints then was take above the top of the elevator and 
-                                            //moved past the initial zero by this amount then rezeroed.
-  
+ 
   private double allowableError = 0.1;
   //hood encoder is zeored when unhooked from the actuators and hood is lifted 
   //vertically until it hits hard stop of the encoder mount
