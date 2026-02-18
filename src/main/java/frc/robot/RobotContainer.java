@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -96,7 +97,8 @@ public class RobotContainer {
 
         hood.setDefaultCommand(
             new RunCommand(
-                ()->hood.stop(), hood )
+                //()->hood.stop(), hood )
+                ()->hood.closedLoopHood(), hood)
         );
 
         // Idle while the robot is disabled. This ensures the configured
@@ -148,9 +150,11 @@ public class RobotContainer {
 
         //operator must hold the left bumper and move the right joystick up or down to manually move the hood.  has a deadband to keep it from moving with stick drift
         m_operatorController.leftBumper().whileTrue(new RunCommand(()->hood.manualMove(MathUtil.applyDeadband(m_operatorController.getRightY(),.1)), hood));
-
-
-
+        m_operatorController.leftBumper().onFalse(new InstantCommand(()->hood.setHoodSetpointToCurrentPosition(),hood));
+        
+        //Only used to test hood posion will change in the fugure
+        m_operatorController.a().onTrue(new InstantCommand(()->hood.setHoodSetpoint(.86), hood));
+        m_operatorController.b().onTrue(new InstantCommand(()->hood.setHoodSetpoint(.80), hood));
 
 
 
