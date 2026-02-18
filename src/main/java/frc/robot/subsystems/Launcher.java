@@ -27,6 +27,11 @@ public class Launcher extends SubsystemBase {
   private final TalonFX rightLauncher;
   private double launcherSetpoint = 0; //rotations per second
 
+  //Setpoints   need to emperically figure these out
+  private double shortSetpoint = 30;
+  private double midSetpint = 40;
+  private double longSetpoint = 50;
+
   /* Be able to switch which control request to use based on a button press */
   /* Start at velocity 0, use slot 0 */
   private final VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
@@ -89,6 +94,11 @@ public class Launcher extends SubsystemBase {
     SmartDashboard.getNumber("Launcher Setpoint Rotations per Second", launcherSetpoint);
     SmartDashboard.getNumber("Right Launcher Speed Rotations per second", rightLauncher.getVelocity().getValueAsDouble());
     SmartDashboard.getNumber("Left Launcher Speed Rotations per second", leftLauncher.getVelocity().getValueAsDouble());
+    SmartDashboard.getNumber(" Right Launcher Voltage", rightLauncher.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.getNumber("Left Launcher Voltage", leftLauncher.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.getNumber("Right Launcher Amp", rightLauncher.getStatorCurrent().getValueAsDouble());
+    SmartDashboard.getNumber("Left Launcher Amp", leftLauncher.getStatorCurrent().getValueAsDouble());
+
   }
 
   public void closedLoopVelocityLaunchVoltage() {
@@ -103,6 +113,27 @@ public class Launcher extends SubsystemBase {
     leftLauncher.setControl(m_velocityTorque.withVelocity(launcherSetpoint));
     rightLauncher.setControl(m_velocityTorque.withVelocity(launcherSetpoint));
 
+  }
+
+
+  public void setLauncherSetpoint(double value){
+    launcherSetpoint = value;
+  }
+
+  public double getLauncherSetpoint(){
+    return launcherSetpoint;
+  }
+
+  public void setLauncherShort(){
+    setLauncherSetpoint(shortSetpoint);
+  }
+
+  public void setlauncherMid(){
+    setLauncherSetpoint(midSetpint);
+  }
+
+  public void setlauncherLong(){
+    setLauncherSetpoint(longSetpoint);
   }
 
   
