@@ -31,6 +31,7 @@ import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.IntakeRoller;
+import frc.robot.subsystems.Launcher;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -58,6 +59,7 @@ public class RobotContainer {
     private final Hopper hopper = new Hopper();
     private final Feeder feeder = new Feeder();
     private final Hood hood = new Hood();
+    private final Launcher launcher = new Launcher();
 
 
     /* Path follower */
@@ -95,10 +97,25 @@ public class RobotContainer {
                 ()->intakeRoller.manualDrive(0.0), intakeRoller) //defualts with roller not spinning
         );
 
+        hopper.setDefaultCommand(
+            new RunCommand(
+                ()->hopper.manualDrive(0.0), hopper) //defualts with roller not spinning
+        );
+
+        feeder.setDefaultCommand(
+            new RunCommand(
+                ()->feeder.manualDrive(0.0), feeder) //defualts with roller not spinning
+        );
+
         hood.setDefaultCommand(
             new RunCommand(
                 //()->hood.stop(), hood )
                 ()->hood.closedLoopHood(), hood)
+        );
+
+        launcher.setDefaultCommand(
+            new RunCommand(
+                ()->launcher.closedLoopVelocityLaunchVoltage(),launcher)
         );
 
         // Idle while the robot is disabled. This ensures the configured
@@ -155,7 +172,9 @@ public class RobotContainer {
 
         //Launcher Setpoints (D-Pad)
         m_operatorController.povDown().onTrue(new InstantCommand(()->hood.setHoodShort(), hood));
-
+        m_operatorController.povDown().onTrue(new InstantCommand(()->hood.setHoodShort(), hood));
+        
+        
         m_operatorController.povLeft().onTrue(new InstantCommand(()->hood.setHoodMid(), hood));
 
         m_operatorController.povUp().onTrue(new InstantCommand(()->hood.setHoodLong(), hood));

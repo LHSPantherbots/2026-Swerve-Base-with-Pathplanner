@@ -94,7 +94,7 @@ public class Hood extends SubsystemBase {
 //                  .inverted(false);
         c_hoodRight.closedLoop
                   .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-                  .p(300.0)//this works, but need to go back and see if a smaller value would be better
+                  .p(300.0)//this works, but need to go back and see if a smaller value would be better 300
                   .i(0)
                   .d(0.0)
                   .maxOutput(1.00)
