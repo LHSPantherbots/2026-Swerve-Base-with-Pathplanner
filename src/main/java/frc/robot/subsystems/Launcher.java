@@ -124,17 +124,23 @@ public class Launcher extends SubsystemBase {
     return launcherSetpoint;
   }
 
+  public void setLauncherStop(){
+    setLauncherSetpoint(0);
+  }
+
   public void setLauncherShort(){
     setLauncherSetpoint(shortSetpoint);
   }
 
-  public void setlauncherMid(){
+  public void setLauncherMid(){
     setLauncherSetpoint(midSetpint);
   }
 
-  public void setlauncherLong(){
+  public void setLauncherLong(){
     setLauncherSetpoint(longSetpoint);
   }
+
+
 
   
   

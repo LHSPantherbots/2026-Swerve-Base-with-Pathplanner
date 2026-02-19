@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -89,7 +90,7 @@ public class RobotContainer {
 
         centerDrive.setDefaultCommand(
             new RunCommand(
-                ()->centerDrive.manualDrive(m_driverController.getRightY()), centerDrive )
+                ()->centerDrive.manualDrive(-m_driverController.getRightY()), centerDrive )
         );
 
         intakeRoller.setDefaultCommand(
@@ -160,7 +161,11 @@ public class RobotContainer {
 
 
         //=================   OPERATOR CONTROLLER ===============================
-        m_operatorController.x().whileTrue(new RunCommand(()->intakeRoller.intake(), intakeRoller));
+        m_operatorController.x().whileTrue( 
+            new ConditionalCommand( 
+                new RunCommand(() -> intakeRoller.eject(), intakeRoller), // if the left pumper is pressed while x is pressed it ejects
+                new RunCommand(() -> intakeRoller.intake(), intakeRoller), // if only the x is pressed it intakes
+                m_operatorController.leftBumper()::getAsBoolean ) );
 
         m_operatorController.rightTrigger().whileTrue(new RunCommand(()->hopper.forward(), hopper));
         m_operatorController.rightTrigger().whileTrue(new RunCommand(()->feeder.forward(), feeder));
@@ -172,15 +177,17 @@ public class RobotContainer {
 
         //Launcher Setpoints (D-Pad)
         m_operatorController.povDown().onTrue(new InstantCommand(()->hood.setHoodShort(), hood));
-        m_operatorController.povDown().onTrue(new InstantCommand(()->hood.setHoodShort(), hood));
+        m_operatorController.povDown().onTrue(new InstantCommand(()->launcher.setLauncherShort(), launcher));
         
         
         m_operatorController.povLeft().onTrue(new InstantCommand(()->hood.setHoodMid(), hood));
+        m_operatorController.povLeft().onTrue(new InstantCommand(()->launcher.setLauncherMid(), launcher));
 
         m_operatorController.povUp().onTrue(new InstantCommand(()->hood.setHoodLong(), hood));
+        m_operatorController.povUp().onTrue(new InstantCommand(()->launcher.setLauncherLong(), launcher));
 
         
-
+        m_operatorController.leftTrigger().onTrue(new InstantCommand(()->launcher.setLauncherStop(), launcher));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
