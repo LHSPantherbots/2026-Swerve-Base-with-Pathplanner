@@ -30,6 +30,8 @@ import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.IntakeRoller;
+import frc.robot.util.Constants.OperatorConstants;
+import frc.robot.subsystems.Climb;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -57,6 +59,7 @@ public class RobotContainer {
     private final Hopper hopper = new Hopper();
     private final Feeder feeder = new Feeder();
     private final Hood hood = new Hood();
+    private final Climb climb = new Climb();
 
 
     /* Path follower */
@@ -73,17 +76,20 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        // Left Stick Controls
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-m_driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-m_driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate((m_driverController.getLeftTriggerAxis()-m_driverController.getRightTriggerAxis()) * MaxAngularRate*2.0) // Drive counterclockwise with negative X (left)
+                     .withVelocityY(-m_driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                     .withRotationalRate((m_driverController.getLeftTriggerAxis()-m_driverController.getRightTriggerAxis()) * MaxAngularRate*2.0) // Drive counterclockwise with negative X (left)
             )
         );
 
+
+        //Noah Right stick
         centerDrive.setDefaultCommand(
             new RunCommand(
                 ()->centerDrive.manualDrive(m_driverController.getRightY()), centerDrive )
@@ -98,6 +104,15 @@ public class RobotContainer {
             new RunCommand(
                 ()->hood.stop(), hood )
         );
+        // Climb: run while driver right bumper is held (boolean). Uses the
+        // Climb.manualDrive(boolean) convenience method added to the subsystem.(
+
+    climb.setDefaultCommand(
+       new RunCommand(
+           ()->climb.manualDrive(0.0), climb )
+       );
+
+        
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
@@ -134,9 +149,9 @@ public class RobotContainer {
 
         //==================  DRIVER CONTROLLER ===============================
 
-        m_driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-
-
+    // Right bumper: climb up at a fixed speed. Left bumper: climb down (reverse).
+    m_driverController.rightBumper().whileTrue(new RunCommand(()->climb.manualDrive(0.5), climb));
+    m_driverController.leftBumper().whileTrue(new RunCommand(()->climb.manualDrive(-0.5), climb));
 
 
 
