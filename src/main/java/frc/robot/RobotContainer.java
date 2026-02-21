@@ -56,6 +56,7 @@ public class RobotContainer {
     
     private final CenterDrive centerDrive = new CenterDrive();
     private final IntakeRoller intakeRoller = new IntakeRoller();
+    private final IntakePivot intakePivot = new IntakePivot();
 
     private final Hopper hopper = new Hopper();
     private final Feeder feeder = new Feeder();
@@ -96,6 +97,13 @@ public class RobotContainer {
         intakeRoller.setDefaultCommand(
             new RunCommand(
                 ()->intakeRoller.manualDrive(0.0), intakeRoller) //defualts with roller not spinning
+        );
+
+        
+        intakePivot.setDefaultCommand(
+            new RunCommand(
+                //()->hood.stop(), hood )
+                ()->intakePivot.motionMagicSetPosition(), intakePivot)
         );
 
         hopper.setDefaultCommand(
@@ -188,6 +196,13 @@ public class RobotContainer {
 
         
         m_operatorController.leftTrigger().onTrue(new InstantCommand(()->launcher.setLauncherStop(), launcher));
+
+        m_operatorController.a().onTrue(new InstantCommand(()->intakePivot.setIntakeDown(), intakePivot));
+        m_operatorController.b().onTrue(new InstantCommand(()->intakePivot.setIntakeMid(), intakePivot));
+        m_operatorController.y().onTrue(new InstantCommand(()->intakePivot.setIntakeUp(), intakePivot));
+        
+
+
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
