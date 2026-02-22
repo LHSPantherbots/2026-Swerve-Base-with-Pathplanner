@@ -13,14 +13,12 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CenterDrive;
@@ -28,9 +26,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.IntakeRoller;
-import frc.robot.util.Constants.OperatorConstants;
 import frc.robot.subsystems.Climb;
 
 public class RobotContainer {
@@ -88,13 +84,13 @@ public class RobotContainer {
             )
         );
 
-
-        //Noah Right stick
+        // TODO: make this a run command under diverconroller
+        //Right stick y drives centerdrive
         centerDrive.setDefaultCommand(
             new RunCommand(
                 ()->centerDrive.manualDrive(m_driverController.getRightY()), centerDrive )
         );
-
+        // center wheel stop when not in use
         intakeRoller.setDefaultCommand(
             new RunCommand(
                 ()->intakeRoller.manualDrive(0.0), intakeRoller) //defualts with roller not spinning
@@ -104,9 +100,7 @@ public class RobotContainer {
             new RunCommand(
                 ()->hood.stop(), hood )
         );
-        // Climb: run while driver right bumper is held (boolean). Uses the
-        // Climb.manualDrive(boolean) convenience method added to the subsystem.(
-
+        // sets climb speed to 0 when not in use
     climb.setDefaultCommand(
        new RunCommand(
            ()->climb.manualDrive(0.0), climb )
@@ -150,8 +144,8 @@ public class RobotContainer {
         //==================  DRIVER CONTROLLER ===============================
 
     // Right bumper: climb up at a fixed speed. Left bumper: climb down (reverse).
-    m_driverController.rightBumper().whileTrue(new RunCommand(()->climb.manualDrive(0.5), climb));
-    m_driverController.leftBumper().whileTrue(new RunCommand(()->climb.manualDrive(-0.5), climb));
+    m_driverController.rightBumper().whileTrue(new RunCommand(()->climb.manualDrive(0.75), climb));
+    m_driverController.leftBumper().whileTrue(new RunCommand(()->climb.manualDrive(-0.75), climb));
 
 
 
