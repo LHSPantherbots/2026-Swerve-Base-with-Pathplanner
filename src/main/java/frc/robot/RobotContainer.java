@@ -16,6 +16,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -27,7 +29,12 @@ import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.IntakeRoller;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8c9569ef37329948fa364bbb9341b1da4ea47f5c
 import frc.robot.subsystems.Climb;
+import frc.robot.subsystems.Launcher;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -51,11 +58,13 @@ public class RobotContainer {
     
     private final CenterDrive centerDrive = new CenterDrive();
     private final IntakeRoller intakeRoller = new IntakeRoller();
+    private final IntakePivot intakePivot = new IntakePivot();
 
     private final Hopper hopper = new Hopper();
     private final Feeder feeder = new Feeder();
     private final Hood hood = new Hood();
     private final Climb climb = new Climb();
+    private final Launcher launcher = new Launcher();
 
 
     /* Path follower */
@@ -89,7 +98,11 @@ public class RobotContainer {
         // has a deadband to keep it from moving with stick drift
         centerDrive.setDefaultCommand(
             new RunCommand(
+<<<<<<< HEAD
                 ()->centerDrive.manualDrive(MathUtil.applyDeadband(m_driverController.getRightY(), 0.09)), centerDrive )
+=======
+                ()->centerDrive.manualDrive(-m_driverController.getRightY()), centerDrive )
+>>>>>>> 8c9569ef37329948fa364bbb9341b1da4ea47f5c
         );
         // center wheel stop when not in use
         intakeRoller.setDefaultCommand(
@@ -97,9 +110,32 @@ public class RobotContainer {
                 ()->intakeRoller.manualDrive(0.0), intakeRoller) //defualts with roller not spinning
         );
 
+        
+        intakePivot.setDefaultCommand(
+            new RunCommand(
+                //()->hood.stop(), hood )
+                ()->intakePivot.motionMagicSetPosition(), intakePivot)
+        );
+
+        hopper.setDefaultCommand(
+            new RunCommand(
+                ()->hopper.manualDrive(0.0), hopper) //defualts with roller not spinning
+        );
+
+        feeder.setDefaultCommand(
+            new RunCommand(
+                ()->feeder.manualDrive(0.0), feeder) //defualts with roller not spinning
+        );
+
         hood.setDefaultCommand(
             new RunCommand(
-                ()->hood.stop(), hood )
+                //()->hood.stop(), hood )
+                ()->hood.closedLoopHood(), hood)
+        );
+
+        launcher.setDefaultCommand(
+            new RunCommand(
+                ()->launcher.closedLoopVelocityLaunchVoltage(),launcher)
         );
         // sets climb speed to 0 when not in use
     climb.setDefaultCommand(
@@ -126,16 +162,38 @@ public class RobotContainer {
 
 
         //=================   OPERATOR CONTROLLER ===============================
-        m_operatorController.x().whileTrue(new RunCommand(()->intakeRoller.intake(), intakeRoller));
+        m_operatorController.x().whileTrue( 
+            new ConditionalCommand( 
+                new RunCommand(() -> intakeRoller.eject(), intakeRoller), // if the left pumper is pressed while x is pressed it ejects
+                new RunCommand(() -> intakeRoller.intake(), intakeRoller), // if only the x is pressed it intakes
+                m_operatorController.leftBumper()::getAsBoolean ) );
 
         m_operatorController.rightTrigger().whileTrue(new RunCommand(()->hopper.forward(), hopper));
         m_operatorController.rightTrigger().whileTrue(new RunCommand(()->feeder.forward(), feeder));
 
         //operator must hold the left bumper and move the right joystick up or down to manually move the hood.  has a deadband to keep it from moving with stick drift
         m_operatorController.leftBumper().whileTrue(new RunCommand(()->hood.manualMove(MathUtil.applyDeadband(m_operatorController.getRightY(),.1)), hood));
+        m_operatorController.leftBumper().onFalse(new InstantCommand(()->hood.setHoodSetpointToCurrentPosition(),hood));
+        
 
+        //Launcher Setpoints (D-Pad)
+        m_operatorController.povDown().onTrue(new InstantCommand(()->hood.setHoodShort(), hood));
+        m_operatorController.povDown().onTrue(new InstantCommand(()->launcher.setLauncherShort(), launcher));
+        
+        
+        m_operatorController.povLeft().onTrue(new InstantCommand(()->hood.setHoodMid(), hood));
+        m_operatorController.povLeft().onTrue(new InstantCommand(()->launcher.setLauncherMid(), launcher));
 
+        m_operatorController.povUp().onTrue(new InstantCommand(()->hood.setHoodLong(), hood));
+        m_operatorController.povUp().onTrue(new InstantCommand(()->launcher.setLauncherLong(), launcher));
 
+        
+        m_operatorController.leftTrigger().onTrue(new InstantCommand(()->launcher.setLauncherStop(), launcher));
+
+        m_operatorController.a().onTrue(new InstantCommand(()->intakePivot.setIntakeDown(), intakePivot));
+        m_operatorController.b().onTrue(new InstantCommand(()->intakePivot.setIntakeMid(), intakePivot));
+        m_operatorController.y().onTrue(new InstantCommand(()->intakePivot.setIntakeUp(), intakePivot));
+        
 
 
 

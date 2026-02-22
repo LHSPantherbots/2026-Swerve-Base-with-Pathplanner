@@ -38,11 +38,18 @@ public class Hood extends SubsystemBase {
   private AbsoluteEncoderConfig c_EncoderConfig = new AbsoluteEncoderConfig();
   private final SparkClosedLoopController hoodController;
 
-  private double pivot_zero_offset = .1078;  //wrist was zeroed vertically up 
-                                            //agains the elevator for initial setpoints then was take above the top of the elevator and 
-                                            //moved past the initial zero by this amount then rezeroed.
-  private double hoodSetpoint = 0.75; //-pivot_zero_offset
+ 
   private double allowableError = 0.1;
+  //hood encoder is zeored when unhooked from the actuators and hood is lifted 
+  //vertically until it hits hard stop of the encoder mount
+  private double hoodMin = .79; // value read all the way down
+  private double hoodMax = .86; // value read all the ay at actuator limits
+  private double hoodSetpoint = hoodMin; //-pivot_zero_offset
+  
+  //Hood Position Setpoints
+  private final double shortSetpoint = .80 ; //need to test emperically
+  private final double midSetpoint = .82;
+  private final double longSetpoint = .84;
 
   private ShuffleboardTab tab = Shuffleboard.getTab("Tuning");  //angles used for shuffleboard; taken from 2024 fulcrum code
   private GenericEntry sbAngle = tab.add("Hood Angle", 1)
@@ -64,16 +71,16 @@ public class Hood extends SubsystemBase {
         c_hoodGlobal
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(5)
-                .inverted(false);
+                .inverted(true);
 
         c_hoodRight
                 .apply(c_hoodGlobal);
              
                 
         c_hoodRight.softLimit
-            .forwardSoftLimit(0.9-pivot_zero_offset)
+            .forwardSoftLimit(hoodMax)
             .forwardSoftLimitEnabled(true)
-            .reverseSoftLimit(0.56)
+            .reverseSoftLimit(hoodMin)
             .reverseSoftLimitEnabled(true);
                 
                 
@@ -87,7 +94,7 @@ public class Hood extends SubsystemBase {
 //                  .inverted(false);
         c_hoodRight.closedLoop
                   .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-                  .p(3.0)//need to tune
+                  .p(300.0)//this works, but need to go back and see if a smaller value would be better 300
                   .i(0)
                   .d(0.0)
                   .maxOutput(1.00)
@@ -152,5 +159,19 @@ public class Hood extends SubsystemBase {
         double error = e_hoodEncoder.getPosition() - hoodSetpoint;
         return (Math.abs(error) < allowableError);
       }
+
+  public void setHoodShort(){
+    setHoodSetpoint(shortSetpoint);
+  }
+
+    public void setHoodMid(){
+    setHoodSetpoint(midSetpoint);
+  }
+
+    public void setHoodLong(){
+    setHoodSetpoint(longSetpoint);
+  }
+
+
 
 }
