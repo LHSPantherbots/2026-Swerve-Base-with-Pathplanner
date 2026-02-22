@@ -31,7 +31,7 @@ public class Climb extends SubsystemBase{
 
         c_Climb
                 .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(30)
+                .smartCurrentLimit(37)
                 
                 .inverted(false); // TODO: should be able to removed
        
@@ -58,6 +58,8 @@ public class Climb extends SubsystemBase{
      public double getPosition() {
         return c_Encoder.getPosition();
     }
+
+    
     // makeing a value to use on our divercontroller bumpers
     // TODO: see if this is even needed and what can be removed
     public void upclimb(double value) {

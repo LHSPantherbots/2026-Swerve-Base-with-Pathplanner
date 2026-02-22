@@ -86,9 +86,10 @@ public class RobotContainer {
 
         // TODO: make this a run command under diverconroller
         //Right stick y drives centerdrive
+        // has a deadband to keep it from moving with stick drift
         centerDrive.setDefaultCommand(
             new RunCommand(
-                ()->centerDrive.manualDrive(m_driverController.getRightY()), centerDrive )
+                ()->centerDrive.manualDrive(MathUtil.applyDeadband(m_driverController.getRightY(), 0.09)), centerDrive )
         );
         // center wheel stop when not in use
         intakeRoller.setDefaultCommand(
@@ -114,31 +115,6 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
-
-        /*DEFAULT CTRE CONTROLS
-
-        m_driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        m_driverController.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-m_driverController.getLeftY(), -m_driverController.getLeftX()))
-        ));
-
-        m_driverController.povUp().whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0.5).withVelocityY(0))
-        );
-        m_driverController.povDown().whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-        );
-
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        m_driverController.back().and(m_driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        m_driverController.back().and(m_driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        m_driverController.start().and(m_driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        m_driverController.start().and(m_driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
-        */
-
-        // Reset the field-centric heading on start press.
 
 
         //==================  DRIVER CONTROLLER ===============================

@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SimplePath"
+            "pathName": "Top Start to depot to middle launch"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "middle launch to top tower"
           }
         }
       ]
