@@ -19,9 +19,10 @@ public class Launcher extends SubsystemBase {
 
   private double launcherSetpoint = 0;
 
-  private double shortSetpoint = 30;
-  private double midSetpoint = 40;
-  private double longSetpoint = 50;
+  private double shortSetpoint = 50;
+  private double midSetpoint = 55;
+  private double longSetpoint = 60;
+  private double extraLongSetpoint = 70;
 
   private final VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
   private final VelocityTorqueCurrentFOC m_velocityTorque = new VelocityTorqueCurrentFOC(0).withSlot(1);
@@ -44,8 +45,8 @@ public class Launcher extends SubsystemBase {
     base.Slot0.kI = 0;
     base.Slot0.kD = 0;
 
-    base.Voltage.withPeakForwardVoltage(8)
-                .withPeakReverseVoltage(-8);
+    base.Voltage.withPeakForwardVoltage(11)
+                .withPeakReverseVoltage(-11);
 
     // Slot 1 (torque velocity)
     base.Slot1.kS = 2.5;
@@ -53,8 +54,8 @@ public class Launcher extends SubsystemBase {
     base.Slot1.kI = 0;
     base.Slot1.kD = 0;
 
-    base.TorqueCurrent.withPeakForwardTorqueCurrent(40)
-                      .withPeakReverseTorqueCurrent(-40);
+    base.TorqueCurrent.withPeakForwardTorqueCurrent(60)
+                      .withPeakReverseTorqueCurrent(-60);
 
     // -----------------------------
     // Left config
@@ -113,7 +114,7 @@ public class Launcher extends SubsystemBase {
     setLauncherSetpoint(0);
   }
 
-  public void setLauncherShort() {
+  public void setLauncherShort() { //front of the hub 1meter- hood angle: 0.79  Launcher speed: 50
     setLauncherSetpoint(shortSetpoint);
   }
 
@@ -124,4 +125,9 @@ public class Launcher extends SubsystemBase {
   public void setLauncherLong() {
     setLauncherSetpoint(longSetpoint);
   }
+
+    public void setLauncherExtraLong() {
+    setLauncherSetpoint(extraLongSetpoint);
+  }
+  
 }

@@ -30,7 +30,7 @@ public class IntakePivot extends SubsystemBase {
   
   private final DutyCycleOut talonOut = new DutyCycleOut(0);
   private final MotionMagicVoltage m_mmReq = new MotionMagicVoltage(0);
-  private double intakePivotSetpoint = .004;
+  private double intakePivotSetpoint = .172;
   private double allowableError = 1.0;
 
   private final double intakeGearRatio = 72.0/20.0 * 5.0 * 4.0;

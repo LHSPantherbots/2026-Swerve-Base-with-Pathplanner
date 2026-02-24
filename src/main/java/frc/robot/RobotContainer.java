@@ -209,6 +209,9 @@ public class RobotContainer {
         m_operatorController.povUp().onTrue(new InstantCommand(()->hood.setHoodLong(), hood));
         m_operatorController.povUp().onTrue(new InstantCommand(()->launcher.setLauncherLong(), launcher));
 
+        m_operatorController.povRight().onTrue(new InstantCommand(()->hood.setHoodExtraLong(), hood));
+        m_operatorController.povRight().onTrue(new InstantCommand(()->launcher.setLauncherExtraLong(), launcher));
+
         
         m_operatorController.leftTrigger().onTrue(new InstantCommand(()->launcher.setLauncherStop(), launcher));
 
