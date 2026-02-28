@@ -13,7 +13,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,8 +29,8 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.IntakeRoller;
+import frc.robot.subsystems.IntakePivot;
 
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Launcher;
@@ -60,6 +59,7 @@ public class RobotContainer {
     private final CenterDrive centerDrive = new CenterDrive();
     private final IntakeRoller intakeRoller = new IntakeRoller();
     private final IntakePivot intakePivot = new IntakePivot();
+
 
     private final Hopper hopper = new Hopper();
     private final Feeder feeder = new Feeder();
@@ -95,6 +95,9 @@ public class RobotContainer {
             )
         );
 
+        // TODO: make this a run command under diverconroller
+        //Right stick y drives centerdrive
+        // has a deadband to keep it from moving with stick drift
 
         //Noah Right stick
         centerDrive.setDefaultCommand(
@@ -136,6 +139,7 @@ public class RobotContainer {
             new RunCommand(
                 ()->launcher.closedLoopVelocityLaunchVoltage(),launcher)
         );
+        // sets climb speed to 0 when not in use
         // Climb: run while driver right bumper is held (boolean). Uses the
         // Climb.manualDrive(boolean) convenience method added to the subsystem.(
 
@@ -183,8 +187,8 @@ public class RobotContainer {
         //==================  DRIVER CONTROLLER ===============================
 
     // Right bumper: climb up at a fixed speed. Left bumper: climb down (reverse).
-    m_driverController.rightBumper().whileTrue(new RunCommand(()->climb.manualDrive(0.5), climb));
-    m_driverController.leftBumper().whileTrue(new RunCommand(()->climb.manualDrive(-0.5), climb));
+    m_driverController.rightBumper().whileTrue(new RunCommand(()->climb.manualDrive(0.75), climb));
+    m_driverController.leftBumper().whileTrue(new RunCommand(()->climb.manualDrive(-0.75), climb));
 
 
 
