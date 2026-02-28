@@ -83,7 +83,7 @@ public class IntakePivot extends SubsystemBase {
     cfg.TorqueCurrent.PeakForwardTorqueCurrent = 50; //Current Limit value used in FOC Torque Mode
     cfg.TorqueCurrent.PeakReverseTorqueCurrent = 50; //Current Limit value used in FOC Torque Mode
 
-    m_mmReq.EnableFOC = true;
+    m_mmReq.EnableFOC = false;
 
 
 
@@ -171,7 +171,7 @@ public class IntakePivot extends SubsystemBase {
   }
 
   public void setIntakeMid(){
-    setIntakeSetpoint(0.1);
+    setIntakeSetpoint(0.04);
   }
 
 

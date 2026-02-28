@@ -50,7 +50,7 @@ public class Hopper extends SubsystemBase {
 
   public void manualDrive(double value){
     talonOut.Output = value;
-    talonOut.EnableFOC = true;
+    talonOut.EnableFOC = false;
     hopper.setControl(talonOut);
 
   }

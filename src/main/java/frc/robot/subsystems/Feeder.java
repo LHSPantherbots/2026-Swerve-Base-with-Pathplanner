@@ -50,7 +50,7 @@ public class Feeder extends SubsystemBase {
 
   public void manualDrive(double value){
     talonOut.Output = value;
-    talonOut.EnableFOC = true;
+    talonOut.EnableFOC = false;
     feeder.setControl(talonOut);
 
   }
@@ -61,5 +61,9 @@ public class Feeder extends SubsystemBase {
 
   public void reverse(){
     manualDrive(.4);
+  }
+
+  public void stop(){
+    manualDrive(0.0);
   }
 }

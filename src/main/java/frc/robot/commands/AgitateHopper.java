@@ -8,22 +8,25 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.IntakeRoller;
+import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Hopper;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AgitateHopper extends Command {
   IntakeRoller intakeRoller;
   IntakePivot intakePivot;
+  Feeder feeder;
   Hopper hopper;
   Integer timer;
-  Integer delay = 100;
+  Integer delay = 50;
   /** Creates a new AgitateHopper. */
-  public AgitateHopper(IntakeRoller intakeRoller, IntakePivot intakePivot, Hopper hopper) {
+  public AgitateHopper(IntakeRoller intakeRoller, IntakePivot intakePivot, Hopper hopper, Feeder feeder) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.intakeRoller = intakeRoller;
     this.intakePivot = intakePivot;
+    this.feeder = feeder;
     this.hopper = hopper;
-    addRequirements(intakeRoller, intakePivot, hopper);
+    addRequirements(intakeRoller, intakePivot, hopper, feeder);
   }
 
   // Called when the command is initially scheduled.
@@ -38,6 +41,7 @@ public class AgitateHopper extends Command {
     timer = timer + 1;
     intakeRoller.intake();;
     hopper.forward();
+    feeder.forward();
     intakePivot.motionMagicSetPosition();
     Integer adjustedVal = timer/delay;
 
@@ -71,6 +75,7 @@ public class AgitateHopper extends Command {
     intakePivot.setIntakeDown();
     intakeRoller.stop();
     hopper.stop();
+    feeder.stop();
   }
 
   // Returns true when the command should end.

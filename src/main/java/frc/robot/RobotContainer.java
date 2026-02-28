@@ -35,6 +35,7 @@ import frc.robot.subsystems.IntakeRoller;
 
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Launcher;
+import frc.robot.subsystems.Leds;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -65,6 +66,7 @@ public class RobotContainer {
     private final Hood hood = new Hood();
     private final Climb climb = new Climb();
     private final Launcher launcher = new Launcher();
+    private final Leds leds = new Leds();
 
 
     /* Path follower */
@@ -99,6 +101,8 @@ public class RobotContainer {
             new RunCommand(
                 ()->centerDrive.manualDrive(-m_driverController.getRightY()), centerDrive )
         );
+
+        leds.setDefaultCommand(new RunCommand(()->leds.rainbow(), leds));
 
         intakeRoller.setDefaultCommand(
             new RunCommand(
@@ -173,6 +177,7 @@ public class RobotContainer {
         */
 
         // Reset the field-centric heading on start press.
+         m_driverController.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
 
         //==================  DRIVER CONTROLLER ===============================
@@ -190,9 +195,7 @@ public class RobotContainer {
                 new RunCommand(() -> intakeRoller.intake(), intakeRoller), // if only the x is pressed it intakes
                 m_operatorController.leftBumper()::getAsBoolean ) );
 
-        m_operatorController.rightTrigger().whileTrue(new RunCommand(()->hopper.forward(), hopper));
-        m_operatorController.rightTrigger().whileTrue(new RunCommand(()->feeder.forward(), feeder));
-
+     
         //operator must hold the left bumper and move the right joystick up or down to manually move the hood.  has a deadband to keep it from moving with stick drift
         m_operatorController.leftBumper().whileTrue(new RunCommand(()->hood.manualMove(MathUtil.applyDeadband(m_operatorController.getRightY(),.1)), hood));
         m_operatorController.leftBumper().onFalse(new InstantCommand(()->hood.setHoodSetpointToCurrentPosition(),hood));
@@ -201,25 +204,31 @@ public class RobotContainer {
         //Launcher Setpoints (D-Pad)
         m_operatorController.povDown().onTrue(new InstantCommand(()->hood.setHoodShort(), hood));
         m_operatorController.povDown().onTrue(new InstantCommand(()->launcher.setLauncherShort(), launcher));
-        
+        m_operatorController.povDown().onTrue(new RunCommand(()->leds.green(), leds));
         
         m_operatorController.povLeft().onTrue(new InstantCommand(()->hood.setHoodMid(), hood));
         m_operatorController.povLeft().onTrue(new InstantCommand(()->launcher.setLauncherMid(), launcher));
+        m_operatorController.povLeft().onTrue(new RunCommand(()->leds.blue(), leds));
 
         m_operatorController.povUp().onTrue(new InstantCommand(()->hood.setHoodLong(), hood));
         m_operatorController.povUp().onTrue(new InstantCommand(()->launcher.setLauncherLong(), launcher));
+        m_operatorController.povUp().onTrue(new RunCommand(()->leds.red(), leds));
 
         m_operatorController.povRight().onTrue(new InstantCommand(()->hood.setHoodExtraLong(), hood));
         m_operatorController.povRight().onTrue(new InstantCommand(()->launcher.setLauncherExtraLong(), launcher));
-
+        m_operatorController.povDown().onTrue(new RunCommand(()->leds.purple(), leds));
         
         m_operatorController.leftTrigger().onTrue(new InstantCommand(()->launcher.setLauncherStop(), launcher));
+        m_operatorController.leftTrigger().onTrue(new InstantCommand(()->hood.setHoodShort(),hood));
+        m_operatorController.leftTrigger().onTrue(new RunCommand(()->leds.rainbow(), leds));
+
+
 
         m_operatorController.a().onTrue(new InstantCommand(()->intakePivot.setIntakeDown(), intakePivot));
         m_operatorController.b().onTrue(new InstantCommand(()->intakePivot.setIntakeMid(), intakePivot));
         m_operatorController.y().onTrue(new InstantCommand(()->intakePivot.setIntakeUp(), intakePivot));
 
-        m_operatorController.rightBumper().whileTrue(new AgitateHopper(intakeRoller, intakePivot, hopper));
+        m_operatorController.rightTrigger().whileTrue(new AgitateHopper(intakeRoller, intakePivot, hopper, feeder));
         
 
 

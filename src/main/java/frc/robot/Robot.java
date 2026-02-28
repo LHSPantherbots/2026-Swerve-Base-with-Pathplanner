@@ -28,6 +28,11 @@ public class Robot extends TimedRobot {
     }
 
     @Override
+    public void robotInit(){
+        LimelightHelpers.SetFiducialIDFiltersOverride("limelight", new int[]{2, 4 , 8, 10});
+    }
+
+    @Override
     public void robotPeriodic() {
         m_timeAndJoystickReplay.update();
         CommandScheduler.getInstance().run();
