@@ -62,4 +62,8 @@ public class Feeder extends SubsystemBase {
   public void reverse(){
     manualDrive(.4);
   }
+  
+  public void stop(){
+    manualDrive(0);
+  }
 }

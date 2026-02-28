@@ -63,4 +63,8 @@ public class IntakeRoller extends SubsystemBase {
   public void eject(){
     manualDrive(.4);
   }
+
+  public void intakeStop(){
+    manualDrive(0);
+  }
 }
