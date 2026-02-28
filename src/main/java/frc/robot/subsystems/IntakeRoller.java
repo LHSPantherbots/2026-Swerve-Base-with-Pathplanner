@@ -50,14 +50,14 @@ public class IntakeRoller extends SubsystemBase {
 
   public void manualDrive(double value){
     talonOut.Output = value;
-    talonOut.EnableFOC = true;
+    talonOut.EnableFOC = false;
     intakeRoller.setControl(talonOut);
 
   }
 
 
   public void intake(){
-    manualDrive(-.4);
+    manualDrive(-.7);
   }
 
   public void reverseIntake(){
@@ -65,6 +65,10 @@ public class IntakeRoller extends SubsystemBase {
   }
 
   public void eject(){
-    manualDrive(.4);
+    manualDrive(.7);
+  }
+
+  public void stop(){
+    manualDrive(0.0);
   }
 }

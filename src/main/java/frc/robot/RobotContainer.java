@@ -21,7 +21,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.AgitateHopper;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CenterDrive;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -33,6 +34,7 @@ import frc.robot.subsystems.IntakePivot;
 
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Launcher;
+import frc.robot.subsystems.Leds;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -64,6 +66,7 @@ public class RobotContainer {
     private final Hood hood = new Hood();
     private final Climb climb = new Climb();
     private final Launcher launcher = new Launcher();
+    private final Leds leds = new Leds();
 
 
     /* Path follower */
@@ -99,8 +102,11 @@ public class RobotContainer {
         //Noah Right stick
         centerDrive.setDefaultCommand(
             new RunCommand(
-                ()->centerDrive.manualDrive(MathUtil.applyDeadband(m_driverController.getRightY(), 0.09)), centerDrive ));
-        // center wheel stop when not in use
+                ()->centerDrive.manualDrive(-m_driverController.getRightY()), centerDrive )
+        );
+
+        leds.setDefaultCommand(new RunCommand(()->leds.rainbow(), leds));
+
         intakeRoller.setDefaultCommand(
             new RunCommand(
                 ()->intakeRoller.manualDrive(0.0), intakeRoller) //defualts with roller not spinning
@@ -151,6 +157,32 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
+        /*DEFAULT CTRE CONTROLS
+
+        m_driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        m_driverController.b().whileTrue(drivetrain.applyRequest(() ->
+            point.withModuleDirection(new Rotation2d(-m_driverController.getLeftY(), -m_driverController.getLeftX()))
+        ));
+
+        m_driverController.povUp().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0.5).withVelocityY(0))
+        );
+        m_driverController.povDown().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
+        );
+
+        // Run SysId routines when holding back/start and X/Y.
+        // Note that each routine should be run exactly once in a single log.
+        m_driverController.back().and(m_driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        m_driverController.back().and(m_driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        m_driverController.start().and(m_driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        m_driverController.start().and(m_driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+        */
+
+        // Reset the field-centric heading on start press.
+         m_driverController.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
 
         //==================  DRIVER CONTROLLER ===============================
 
@@ -161,27 +193,47 @@ public class RobotContainer {
 
 
         //=================   OPERATOR CONTROLLER ===============================
+        m_operatorController.x().whileTrue( 
+            new ConditionalCommand( 
+                new RunCommand(() -> intakeRoller.eject(), intakeRoller), // if the left pumper is pressed while x is pressed it ejects
+                new RunCommand(() -> intakeRoller.intake(), intakeRoller), // if only the x is pressed it intakes
+                m_operatorController.leftBumper()::getAsBoolean ) );
 
-        //operator must hold the X button to run the intake roller at the default speed for intaking.  when released, it will stop the roller.
-        m_operatorController.x().whileTrue(new RunCommand(()->intakeRoller.intake(), intakeRoller));
+     
+        //operator must hold the left bumper and move the right joystick up or down to manually move the hood.  has a deadband to keep it from moving with stick drift
+        m_operatorController.leftBumper().whileTrue(new RunCommand(()->hood.manualMove(MathUtil.applyDeadband(m_operatorController.getRightY(),.1)), hood));
+        m_operatorController.leftBumper().onFalse(new InstantCommand(()->hood.setHoodSetpointToCurrentPosition(),hood));
+        
 
-        //operator must hold the right trigger to run the hopper forward and the feeder forward at the default speeds for shooting.  when released, they will stop.
-        m_operatorController.rightTrigger().whileTrue(new RunCommand(()->hopper.forward(), hopper).alongWith(new RunCommand(()->feeder.forward(), feeder)));
+        //Launcher Setpoints (D-Pad)
+        m_operatorController.povDown().onTrue(new InstantCommand(()->hood.setHoodShort(), hood));
+        m_operatorController.povDown().onTrue(new InstantCommand(()->launcher.setLauncherShort(), launcher));
+        m_operatorController.povDown().onTrue(new RunCommand(()->leds.green(), leds));
+        
+        m_operatorController.povLeft().onTrue(new InstantCommand(()->hood.setHoodMid(), hood));
+        m_operatorController.povLeft().onTrue(new InstantCommand(()->launcher.setLauncherMid(), launcher));
+        m_operatorController.povLeft().onTrue(new RunCommand(()->leds.blue(), leds));
+
+        m_operatorController.povUp().onTrue(new InstantCommand(()->hood.setHoodLong(), hood));
+        m_operatorController.povUp().onTrue(new InstantCommand(()->launcher.setLauncherLong(), launcher));
+        m_operatorController.povUp().onTrue(new RunCommand(()->leds.red(), leds));
 
         m_operatorController.povRight().onTrue(new InstantCommand(()->hood.setHoodExtraLong(), hood));
         m_operatorController.povRight().onTrue(new InstantCommand(()->launcher.setLauncherExtraLong(), launcher));
-
+        m_operatorController.povDown().onTrue(new RunCommand(()->leds.purple(), leds));
         
         m_operatorController.leftTrigger().onTrue(new InstantCommand(()->launcher.setLauncherStop(), launcher));
+        m_operatorController.leftTrigger().onTrue(new InstantCommand(()->hood.setHoodShort(),hood));
+        m_operatorController.leftTrigger().onTrue(new RunCommand(()->leds.rainbow(), leds));
 
-        //operator must click the left trigger to stop the launcher.
-        m_operatorController.leftTrigger().onTrue(new RunCommand(() -> launcher.stopLauncher(), launcher));
 
-        //operator must hold the left bumper and x to run the intake roller in reverse at the default speed for ejecting.  when released, it will stop the roller.
-        m_operatorController.leftBumper().and(m_operatorController.x()).whileTrue(new RunCommand(() -> intakeRoller.reverseIntake(), intakeRoller));
 
-        //operator must hold the left bumper and move the right joystick up or down to manually move the intakepivot.  has a deadband to keep it from moving with stick drift
-        m_operatorController.leftBumper().whileTrue(new RunCommand(()-> intakePivot.manualDrive(MathUtil.applyDeadband(m_operatorController.getRightY(),.1)), intakePivot));
+        m_operatorController.a().onTrue(new InstantCommand(()->intakePivot.setIntakeDown(), intakePivot));
+        m_operatorController.b().onTrue(new InstantCommand(()->intakePivot.setIntakeMid(), intakePivot));
+        m_operatorController.y().onTrue(new InstantCommand(()->intakePivot.setIntakeUp(), intakePivot));
+
+        m_operatorController.rightTrigger().whileTrue(new AgitateHopper(intakeRoller, intakePivot, hopper, feeder));
+        
 
 
 

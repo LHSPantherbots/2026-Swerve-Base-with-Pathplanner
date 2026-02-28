@@ -42,8 +42,8 @@ public class CenterDrive extends SubsystemBase {
 
 
   public void manualDrive(double value){
-    talonOut.Output = -value;
-    talonOut.EnableFOC = true;
+    talonOut.Output = value;
+    talonOut.EnableFOC = false;
     centerDrive.setControl(talonOut);
 
   }
