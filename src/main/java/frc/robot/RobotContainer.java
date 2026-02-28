@@ -58,6 +58,7 @@ public class RobotContainer {
     private final IntakeRoller intakeRoller = new IntakeRoller();
     private final IntakePivot intakePivot = new IntakePivot();
 
+
     private final Hopper hopper = new Hopper();
     private final Feeder feeder = new Feeder();
     private final Hood hood = new Hood();
@@ -160,38 +161,24 @@ public class RobotContainer {
 
 
         //=================   OPERATOR CONTROLLER ===============================
-        m_operatorController.x().whileTrue( 
-            new ConditionalCommand( 
-                new RunCommand(() -> intakeRoller.eject(), intakeRoller), // if the left pumper is pressed while x is pressed it ejects
-                new RunCommand(() -> intakeRoller.intake(), intakeRoller), // if only the x is pressed it intakes
-                m_operatorController.leftBumper()::getAsBoolean ) );
 
-        m_operatorController.rightTrigger().whileTrue(new RunCommand(()->hopper.forward(), hopper));
-        m_operatorController.rightTrigger().whileTrue(new RunCommand(()->feeder.forward(), feeder));
+        //operator must hold the X button to run the intake roller at the default speed for intaking.  when released, it will stop the roller.
+        m_operatorController.x().whileTrue(new RunCommand(()->intakeRoller.intake(), intakeRoller));
 
-        //operator must hold the left bumper and move the right joystick up or down to manually move the hood.  has a deadband to keep it from moving with stick drift
-        m_operatorController.leftBumper().whileTrue(new RunCommand(()->hood.manualMove(MathUtil.applyDeadband(m_operatorController.getRightY(),.1)), hood));
-        m_operatorController.leftBumper().onFalse(new InstantCommand(()->hood.setHoodSetpointToCurrentPosition(),hood));
-        
+        //operator must hold the right trigger to run the hopper forward and the feeder forward at the default speeds for shooting.  when released, they will stop.
+        m_operatorController.rightTrigger().whileTrue(new RunCommand(()->hopper.forward(), hopper).alongWith(new RunCommand(()->feeder.forward(), feeder)));
 
-        //Launcher Setpoints (D-Pad)
-        m_operatorController.povDown().onTrue(new InstantCommand(()->hood.setHoodShort(), hood));
-        m_operatorController.povDown().onTrue(new InstantCommand(()->launcher.setLauncherShort(), launcher));
-        
-        
-        m_operatorController.povLeft().onTrue(new InstantCommand(()->hood.setHoodMid(), hood));
-        m_operatorController.povLeft().onTrue(new InstantCommand(()->launcher.setLauncherMid(), launcher));
+        //operator must hold the left bumper and move the left joystick up or down to manually move the hood.  has a deadband to keep it from moving with stick drift
+        m_operatorController.leftBumper().whileTrue(new RunCommand(()-> hood.manualMove(MathUtil.applyDeadband(m_operatorController.getLeftY(),.1)), hood));
 
-        m_operatorController.povUp().onTrue(new InstantCommand(()->hood.setHoodLong(), hood));
-        m_operatorController.povUp().onTrue(new InstantCommand(()->launcher.setLauncherLong(), launcher));
+        //operator must click the left trigger to stop the launcher.
+        m_operatorController.leftTrigger().onTrue(new RunCommand(() -> launcher.stopLauncher(), launcher));
 
-        
-        m_operatorController.leftTrigger().onTrue(new InstantCommand(()->launcher.setLauncherStop(), launcher));
+        //operator must hold the left bumper and x to run the intake roller in reverse at the default speed for ejecting.  when released, it will stop the roller.
+        m_operatorController.leftBumper().and(m_operatorController.x()).whileTrue(new RunCommand(() -> intakeRoller.reverseIntake(), intakeRoller));
 
-        m_operatorController.a().onTrue(new InstantCommand(()->intakePivot.setIntakeDown(), intakePivot));
-        m_operatorController.b().onTrue(new InstantCommand(()->intakePivot.setIntakeMid(), intakePivot));
-        m_operatorController.y().onTrue(new InstantCommand(()->intakePivot.setIntakeUp(), intakePivot));
-        
+        //operator must hold the left bumper and move the right joystick up or down to manually move the intakepivot.  has a deadband to keep it from moving with stick drift
+        m_operatorController.leftBumper().whileTrue(new RunCommand(()-> intakePivot.manualDrive(MathUtil.applyDeadband(m_operatorController.getRightY(),.1)), intakePivot));
 
 
 

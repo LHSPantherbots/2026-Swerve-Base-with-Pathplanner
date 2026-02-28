@@ -105,13 +105,11 @@ public class Launcher extends SubsystemBase {
     launcherSetpoint = value;
   }
 
-  public double getLauncherSetpoint() {
-    return launcherSetpoint;
+  public void stopLauncher(){
+    leftLauncher.set(0);
+    rightLauncher.set(0);
   }
-
-  public void setLauncherStop() {
-    setLauncherSetpoint(0);
-  }
+  
 
   public void setLauncherShort() {
     setLauncherSetpoint(shortSetpoint);

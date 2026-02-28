@@ -72,8 +72,6 @@ public class IntakePivot extends SubsystemBase {
     //cfg.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 70.9;
     //cfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     //cfg.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0;
-    cfg.CurrentLimits.StatorCurrentLimitEnable = true;
-    cfg.CurrentLimits.StatorCurrentLimit = 60; //Output Current Limit
     //cfg.CurrentLimits.SupplyTimeThreshold = 5; //Amont of time to allow current over supply limit
     cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
     cfg.CurrentLimits.SupplyCurrentLimit = 60; //Supply Current Limit
@@ -137,8 +135,8 @@ public class IntakePivot extends SubsystemBase {
     talonOut.Output = value;
     talonOut.EnableFOC = true;
     intakePivot.setControl(talonOut);
-
   }
+  
   public void motionMagicSetPosition(){
     intakePivot.setControl(m_mmReq.withPosition(intakePivotSetpoint).withSlot(0));
   }
