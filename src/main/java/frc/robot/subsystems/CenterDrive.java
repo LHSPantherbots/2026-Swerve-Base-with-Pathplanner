@@ -24,13 +24,8 @@ public class CenterDrive extends SubsystemBase {
 
     TalonFXConfiguration cfg = new TalonFXConfiguration();
 
-    //cfg.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    //cfg.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 70.9;
-    //cfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    //cfg.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0;
     cfg.CurrentLimits.StatorCurrentLimitEnable = true;
     cfg.CurrentLimits.StatorCurrentLimit = 60; //Output Current Limit
-    //cfg.CurrentLimits.SupplyTimeThreshold = 5; //Amount of time to allow current over supply limit
    
     cfg.MotionMagic.MotionMagicCruiseVelocity = 50; // 5 rotations per second
     cfg.MotionMagic.MotionMagicAcceleration = 100; // Take approximately 0.5 seconds to reach max vel
