@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
+import frc.robot.commands.AgitateHopper;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CenterDrive;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -218,6 +218,8 @@ public class RobotContainer {
         m_operatorController.a().onTrue(new InstantCommand(()->intakePivot.setIntakeDown(), intakePivot));
         m_operatorController.b().onTrue(new InstantCommand(()->intakePivot.setIntakeMid(), intakePivot));
         m_operatorController.y().onTrue(new InstantCommand(()->intakePivot.setIntakeUp(), intakePivot));
+
+        m_operatorController.rightBumper().whileTrue(new AgitateHopper(intakeRoller, intakePivot, hopper));
         
 
 
