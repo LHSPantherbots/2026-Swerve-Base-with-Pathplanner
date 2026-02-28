@@ -19,7 +19,7 @@ public class Feeder extends SubsystemBase {
 
 
   public Feeder() {
-    feeder = new TalonFX(CanIdConstants.hopperCanId);
+    feeder = new TalonFX(CanIdConstants.feederCanId);
 
 
     TalonFXConfiguration cfg = new TalonFXConfiguration();
@@ -56,10 +56,10 @@ public class Feeder extends SubsystemBase {
   }
 
   public void forward(){
-    manualDrive(.4);
+    manualDrive(-.4);
   }
 
   public void reverse(){
-    manualDrive(-.4);
+    manualDrive(.4);
   }
 }
