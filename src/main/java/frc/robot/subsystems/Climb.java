@@ -24,6 +24,7 @@ public class Climb extends SubsystemBase{
 
     
     // setting what moter is set
+
     public Climb() {      
         m_Climb = new SparkMax(13, MotorType.kBrushless);
         c_Encoder = m_Climb.getEncoder();
@@ -51,6 +52,7 @@ public class Climb extends SubsystemBase{
     
     }
   // stop command
+
      public void stop() {
         m_Climb.set(0.0);
     }
@@ -66,6 +68,7 @@ public class Climb extends SubsystemBase{
         m_Climb.set(value);
     }
     
+    // New overload: allow direct speed control (positive = up, negative = down)
     public void manualDrive(double speed) {
         upclimb(speed);
     }

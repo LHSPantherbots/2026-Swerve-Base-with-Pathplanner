@@ -94,6 +94,8 @@ public class RobotContainer {
         // TODO: make this a run command under diverconroller
         //Right stick y drives centerdrive
         // has a deadband to keep it from moving with stick drift
+
+        //Noah Right stick
         centerDrive.setDefaultCommand(
             new RunCommand(
                 ()->centerDrive.manualDrive(MathUtil.applyDeadband(m_driverController.getRightY(), 0.09)), centerDrive ));
@@ -131,6 +133,9 @@ public class RobotContainer {
                 ()->launcher.closedLoopVelocityLaunchVoltage(),launcher)
         );
         // sets climb speed to 0 when not in use
+        // Climb: run while driver right bumper is held (boolean). Uses the
+        // Climb.manualDrive(boolean) convenience method added to the subsystem.(
+
     climb.setDefaultCommand(
        new RunCommand(
            ()->climb.manualDrive(0.0), climb )
