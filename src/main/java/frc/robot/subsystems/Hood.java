@@ -47,9 +47,10 @@ public class Hood extends SubsystemBase {
   private double hoodSetpoint = hoodMin; //-pivot_zero_offset
   
   //Hood Position Setpoints
-  private final double shortSetpoint = .80 ; //need to test emperically
-  private final double midSetpoint = .82;
-  private final double longSetpoint = .84;
+  private final double shortSetpoint = .79 ; //need to test emperically
+  private final double midSetpoint = .81;
+  private final double longSetpoint = .83;
+  private final double extraLongSetpoint = .84;
 
   private ShuffleboardTab tab = Shuffleboard.getTab("Tuning");  //angles used for shuffleboard; taken from 2024 fulcrum code
   private GenericEntry sbAngle = tab.add("Hood Angle", 1)
@@ -160,7 +161,7 @@ public class Hood extends SubsystemBase {
         return (Math.abs(error) < allowableError);
       }
 
-  public void setHoodShort(){
+  public void setHoodShort(){ //front of the hub 1meter- hood angle: 0.79  Launcher speed: 50
     setHoodSetpoint(shortSetpoint);
   }
 
@@ -170,6 +171,10 @@ public class Hood extends SubsystemBase {
 
     public void setHoodLong(){
     setHoodSetpoint(longSetpoint);
+  }
+
+  public void setHoodExtraLong(){
+    setHoodSetpoint(extraLongSetpoint);
   }
 
 

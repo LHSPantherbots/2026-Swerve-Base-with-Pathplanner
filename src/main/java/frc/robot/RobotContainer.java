@@ -168,8 +168,11 @@ public class RobotContainer {
         //operator must hold the right trigger to run the hopper forward and the feeder forward at the default speeds for shooting.  when released, they will stop.
         m_operatorController.rightTrigger().whileTrue(new RunCommand(()->hopper.forward(), hopper).alongWith(new RunCommand(()->feeder.forward(), feeder)));
 
-        //operator must hold the left bumper and move the left joystick up or down to manually move the hood.  has a deadband to keep it from moving with stick drift
-        m_operatorController.leftBumper().whileTrue(new RunCommand(()-> hood.manualMove(MathUtil.applyDeadband(m_operatorController.getLeftY(),.1)), hood));
+        m_operatorController.povRight().onTrue(new InstantCommand(()->hood.setHoodExtraLong(), hood));
+        m_operatorController.povRight().onTrue(new InstantCommand(()->launcher.setLauncherExtraLong(), launcher));
+
+        
+        m_operatorController.leftTrigger().onTrue(new InstantCommand(()->launcher.setLauncherStop(), launcher));
 
         //operator must click the left trigger to stop the launcher.
         m_operatorController.leftTrigger().onTrue(new RunCommand(() -> launcher.stopLauncher(), launcher));
