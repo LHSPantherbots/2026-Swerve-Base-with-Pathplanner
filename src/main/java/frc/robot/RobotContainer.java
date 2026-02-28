@@ -13,7 +13,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CenterDrive;
@@ -30,8 +28,8 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.IntakeRoller;
+import frc.robot.subsystems.IntakePivot;
 
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Launcher;
@@ -59,6 +57,7 @@ public class RobotContainer {
     private final CenterDrive centerDrive = new CenterDrive();
     private final IntakeRoller intakeRoller = new IntakeRoller();
     private final IntakePivot intakePivot = new IntakePivot();
+
 
     private final Hopper hopper = new Hopper();
     private final Feeder feeder = new Feeder();
@@ -93,13 +92,15 @@ public class RobotContainer {
             )
         );
 
+        // TODO: make this a run command under diverconroller
+        //Right stick y drives centerdrive
+        // has a deadband to keep it from moving with stick drift
 
         //Noah Right stick
         centerDrive.setDefaultCommand(
             new RunCommand(
-                ()->centerDrive.manualDrive(-m_driverController.getRightY()), centerDrive )
-        );
-
+                ()->centerDrive.manualDrive(MathUtil.applyDeadband(m_driverController.getRightY(), 0.09)), centerDrive ));
+        // center wheel stop when not in use
         intakeRoller.setDefaultCommand(
             new RunCommand(
                 ()->intakeRoller.manualDrive(0.0), intakeRoller) //defualts with roller not spinning
@@ -132,6 +133,7 @@ public class RobotContainer {
             new RunCommand(
                 ()->launcher.closedLoopVelocityLaunchVoltage(),launcher)
         );
+        // sets climb speed to 0 when not in use
         // Climb: run while driver right bumper is held (boolean). Uses the
         // Climb.manualDrive(boolean) convenience method added to the subsystem.(
 
@@ -149,65 +151,22 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        /*DEFAULT CTRE CONTROLS
-
-        m_driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        m_driverController.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-m_driverController.getLeftY(), -m_driverController.getLeftX()))
-        ));
-
-        m_driverController.povUp().whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0.5).withVelocityY(0))
-        );
-        m_driverController.povDown().whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-        );
-
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        m_driverController.back().and(m_driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        m_driverController.back().and(m_driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        m_driverController.start().and(m_driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        m_driverController.start().and(m_driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
-        */
-
-        // Reset the field-centric heading on start press.
-
 
         //==================  DRIVER CONTROLLER ===============================
 
     // Right bumper: climb up at a fixed speed. Left bumper: climb down (reverse).
-    m_driverController.rightBumper().whileTrue(new RunCommand(()->climb.manualDrive(0.5), climb));
-    m_driverController.leftBumper().whileTrue(new RunCommand(()->climb.manualDrive(-0.5), climb));
+    m_driverController.rightBumper().whileTrue(new RunCommand(()->climb.manualDrive(0.75), climb));
+    m_driverController.leftBumper().whileTrue(new RunCommand(()->climb.manualDrive(-0.75), climb));
 
 
 
         //=================   OPERATOR CONTROLLER ===============================
-        m_operatorController.x().whileTrue( 
-            new ConditionalCommand( 
-                new RunCommand(() -> intakeRoller.eject(), intakeRoller), // if the left pumper is pressed while x is pressed it ejects
-                new RunCommand(() -> intakeRoller.intake(), intakeRoller), // if only the x is pressed it intakes
-                m_operatorController.leftBumper()::getAsBoolean ) );
 
-        m_operatorController.rightTrigger().whileTrue(new RunCommand(()->hopper.forward(), hopper));
-        m_operatorController.rightTrigger().whileTrue(new RunCommand(()->feeder.forward(), feeder));
+        //operator must hold the X button to run the intake roller at the default speed for intaking.  when released, it will stop the roller.
+        m_operatorController.x().whileTrue(new RunCommand(()->intakeRoller.intake(), intakeRoller));
 
-        //operator must hold the left bumper and move the right joystick up or down to manually move the hood.  has a deadband to keep it from moving with stick drift
-        m_operatorController.leftBumper().whileTrue(new RunCommand(()->hood.manualMove(MathUtil.applyDeadband(m_operatorController.getRightY(),.1)), hood));
-        m_operatorController.leftBumper().onFalse(new InstantCommand(()->hood.setHoodSetpointToCurrentPosition(),hood));
-        
-
-        //Launcher Setpoints (D-Pad)
-        m_operatorController.povDown().onTrue(new InstantCommand(()->hood.setHoodShort(), hood));
-        m_operatorController.povDown().onTrue(new InstantCommand(()->launcher.setLauncherShort(), launcher));
-        
-        
-        m_operatorController.povLeft().onTrue(new InstantCommand(()->hood.setHoodMid(), hood));
-        m_operatorController.povLeft().onTrue(new InstantCommand(()->launcher.setLauncherMid(), launcher));
-
-        m_operatorController.povUp().onTrue(new InstantCommand(()->hood.setHoodLong(), hood));
-        m_operatorController.povUp().onTrue(new InstantCommand(()->launcher.setLauncherLong(), launcher));
+        //operator must hold the right trigger to run the hopper forward and the feeder forward at the default speeds for shooting.  when released, they will stop.
+        m_operatorController.rightTrigger().whileTrue(new RunCommand(()->hopper.forward(), hopper).alongWith(new RunCommand(()->feeder.forward(), feeder)));
 
         m_operatorController.povRight().onTrue(new InstantCommand(()->hood.setHoodExtraLong(), hood));
         m_operatorController.povRight().onTrue(new InstantCommand(()->launcher.setLauncherExtraLong(), launcher));
@@ -215,10 +174,14 @@ public class RobotContainer {
         
         m_operatorController.leftTrigger().onTrue(new InstantCommand(()->launcher.setLauncherStop(), launcher));
 
-        m_operatorController.a().onTrue(new InstantCommand(()->intakePivot.setIntakeDown(), intakePivot));
-        m_operatorController.b().onTrue(new InstantCommand(()->intakePivot.setIntakeMid(), intakePivot));
-        m_operatorController.y().onTrue(new InstantCommand(()->intakePivot.setIntakeUp(), intakePivot));
-        
+        //operator must click the left trigger to stop the launcher.
+        m_operatorController.leftTrigger().onTrue(new RunCommand(() -> launcher.stopLauncher(), launcher));
+
+        //operator must hold the left bumper and x to run the intake roller in reverse at the default speed for ejecting.  when released, it will stop the roller.
+        m_operatorController.leftBumper().and(m_operatorController.x()).whileTrue(new RunCommand(() -> intakeRoller.reverseIntake(), intakeRoller));
+
+        //operator must hold the left bumper and move the right joystick up or down to manually move the intakepivot.  has a deadband to keep it from moving with stick drift
+        m_operatorController.leftBumper().whileTrue(new RunCommand(()-> intakePivot.manualDrive(MathUtil.applyDeadband(m_operatorController.getRightY(),.1)), intakePivot));
 
 
 

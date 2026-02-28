@@ -106,13 +106,11 @@ public class Launcher extends SubsystemBase {
     launcherSetpoint = value;
   }
 
-  public double getLauncherSetpoint() {
-    return launcherSetpoint;
+  public void stopLauncher(){
+    leftLauncher.set(0);
+    rightLauncher.set(0);
   }
-
-  public void setLauncherStop() {
-    setLauncherSetpoint(0);
-  }
+  
 
   public void setLauncherShort() { //front of the hub 1meter- hood angle: 0.79  Launcher speed: 50
     setLauncherSetpoint(shortSetpoint);
